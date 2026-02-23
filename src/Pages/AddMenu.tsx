@@ -4,12 +4,12 @@ import { useNavigate } from "react-router";
 
 export default function AddMenu() {
     const [showAlert, setShowAlert] = useState(false);
-    const [nama, setName] = useState("1124016_Indomie");
-    const [deskripsi, setDesc] = useState("tes");
-    const [harga, setPrice] = useState(5000);
-    const [size, setSize] = useState("small");
-    const [label, setLabel] = useState("vegan");
-    const [kategori, setCategory] = useState("minuman");
+    const [nama, setName] = useState("");
+    const [deskripsi, setDesc] = useState("");
+    const [harga, setPrice] = useState(0);
+    const [size, setSize] = useState("");
+    const [label, setLabel] = useState("");
+    const [kategori, setCategory] = useState("");
     const navigate = useNavigate();
 
     const addMenu = async () => {
