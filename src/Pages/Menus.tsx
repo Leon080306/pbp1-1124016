@@ -1,57 +1,39 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { useEffect, useState } from "react"
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router";
-import type { Menu } from "./../types";
+import type { Menu } from "../types";
+import { useMenu } from "../hooks/useMenu";
+import { useDeleteMenu } from "../hooks/useDeleteMenu";
 
 export default function Menu() {
-    const [menuList, setMenuList] = useState<Menu[]>([]);
     const navigate = useNavigate();
     const [openConfirm, setOpenConfirm] = useState(false);
     const [deleteMenuId, setDeleteMenuId] = useState("");
+    const { reload, menuList: rawMenu, menuState } = useMenu();
+    const deleteMenu = useDeleteMenu();
 
     useEffect(() => {
-        const fetchMenus = async () => {
-            const getuserInfo = await fetch("http://localhost:5173/api/list-menu", {
-                method: "GET",
-                headers: {
-                    "content-type": "application/json"
-                },
-            })
-            const data = await getuserInfo.json();
-            setMenuList(data);
-            console.log(data);
+        if (menuState !== 'fulffiled') {
+            reload();
         }
-        fetchMenus();
     }, [])
 
+    const menuList = useMemo(() => {
+        return [...rawMenu].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }, [rawMenu])
+
     const handleDelete = async (menuId: string) => {
-        const response = await fetch("http://localhost:5173/api/delete-menu/" + menuId, {
-            method: "DELETE",
-            headers: {
-                "content-type": "application/json"
-            },
-        })
-
-        const data = await response.json();
-        if (response.status !== 200) {
-            alert("Failed to delete menu: " + data.message);
-            return;
+        if(await deleteMenu(menuId)) {
+            setOpenConfirm(false);
         }
+    }
 
-        setOpenConfirm(false);
-
-        const fetchMenus = async () => {
-            const getuserInfo = await fetch("http://localhost:5173/api/list-menu", {
-                method: "GET",
-                headers: {
-                    "content-type": "application/json"
-                },
-            })
-            const data = await getuserInfo.json();
-            setMenuList(data);
-            console.log(data);
-        }
-        fetchMenus();
+    if (menuState === 'loading' || menuState === 'pending') {
+        return (
+            <Typography sx={{ textAlign: "center", marginTop: 4 }}>
+                Loading menus...
+            </Typography>
+        );
     }
 
     return <div style={{

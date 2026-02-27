@@ -1,10 +1,10 @@
 import { lazy } from "react";
 import { Route, Routes } from "react-router";
 
-const Menu = lazy(() => import('../Pages/Menus'));
-const AddMenu = lazy(() => import('../Pages/AddMenu'));
-const MenuDetail = lazy(() => import('../Pages/MenuDetail'));
-const EditMenu = lazy(() => import('../Pages/EditMenu'));
+const Menu = lazy(() => import('../pages/Menus'));
+const AddMenu = lazy(() => import('../pages/AddMenu'));
+const MenuDetail = lazy(() => import('../pages/MenuDetail'));
+const EditMenu = lazy(() => import('../pages/EditMenu'));
 
 export default function AppRoutes() {
     return (

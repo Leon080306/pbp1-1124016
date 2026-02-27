@@ -1,68 +1,47 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Alert, Button, FormControl, InputLabel, MenuItem, Paper, Select, Slide, Snackbar, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useEditMenu } from "../hooks/useEditMenu";
+import type { Kategori, Label, Size } from "../types";
+import { useMenu } from "../hooks/useMenu";
 
 export default function EditMenu() {
     const [showAlert, setShowAlert] = useState(false);
     const [nama, setName] = useState("");
     const [deskripsi, setDesc] = useState("");
     const [harga, setPrice] = useState(0);
-    const [size, setSize] = useState("");
-    const [label, setLabel] = useState("");
-    const [kategori, setCategory] = useState("");
+    const [size, setSize] = useState<Size | "">("");
+    const [label, setLabel] = useState<Label | "">("");
+    const [kategori, setCategory] = useState<Kategori | "">("");
     const navigate = useNavigate();
-    const {id} = useParams();
+    const { id } = useParams();
+    const editMenu = useEditMenu();
+    const { menuList } = useMenu();
 
     useEffect(() => {
-        const getDetails = async () => {
-            const response = await fetch("http://localhost:5173/api/menu/" + id, {
-                method: "GET",
-                headers: {
-                    "content-type": "application/json"
-                },
-            })
+        const currentMenu = menuList.find(menu => menu.id === id);
+        if (!currentMenu) return;
 
-            const data = await response.json();
-            if (response.status !== 200) {
-                alert("Failed to create menu: " + data.message);
-                return;
-            }
-            setName(data.nama);
-            setDesc(data.deskripsi);
-            setPrice(data.harga);
-            setSize(data.size);
-            setLabel(data.label);
-            setCategory(data.kategori);
-        }
-        getDetails();
+        setName(currentMenu.nama ?? "");
+        setDesc(currentMenu.deskripsi ?? "");
+        setPrice(currentMenu.harga ?? 0);
+        setSize(currentMenu.size ?? "");
+        setLabel(currentMenu.label ?? "");
+        setCategory(currentMenu.kategori ?? "");
     }, [])
 
-    const editMenu = async () => {
-        const response = await fetch("http://localhost:5173/api/update-menu/" + id, {
-            method: "PUT",
-            headers: {
-                "content-type": "application/json"
-            },
-            body: JSON.stringify({
-                nama,
-                deskripsi,
-                harga,
-                size,
-                label,
-                kategori
-            }),
-        })
-
-        const data = await response.json();
-        if (response.status !== 200) {
-            alert("Failed to edit menu: " + data.message);
+    const edit = async () => {
+        if (!id || !size || !label || !kategori || !nama || !deskripsi || !harga) {
             return;
         }
 
-        setShowAlert(true);
-        setTimeout(() => {
-            navigate("/menu/" + id);
-        }, 1000)
+        if (await editMenu({ id, nama, deskripsi, harga, size, label, kategori })) {
+            setShowAlert(true);
+            setTimeout(() => {
+                navigate("/menu/" + id);
+            }, 1000)
+        }
     }
 
     return <div>
@@ -99,12 +78,12 @@ export default function EditMenu() {
                             flex: "1"
                         }}>
                             <TextField label="Enter menu name" variant="outlined" value={nama}
-                            sx={{
-                                width: "100%",
-                            }} 
-                            onChange={(e) => {
-                                { setName(e.target.value) }
-                            }} 
+                                sx={{
+                                    width: "100%",
+                                }}
+                                onChange={(e) => {
+                                    { setName(e.target.value) }
+                                }}
 
                             />
                             <TextField
@@ -139,7 +118,7 @@ export default function EditMenu() {
                                     label="Size"
                                     value={size}
                                     onChange={(e) => {
-                                        setSize(e.target.value as string);
+                                        setSize(e.target.value);
                                     }}
                                 >
                                     <MenuItem value="small">Small</MenuItem>
@@ -157,7 +136,7 @@ export default function EditMenu() {
                                     id="demo-simple-select"
                                     label="Label"
                                     onChange={(e) => {
-                                        setLabel(e.target.value as string);
+                                        setLabel(e.target.value);
                                     }}
                                     value={label}
                                 >
@@ -175,7 +154,7 @@ export default function EditMenu() {
                                     id="demo-simple-select"
                                     label="Category"
                                     onChange={(e) => {
-                                        setCategory(e.target.value as string);
+                                        setCategory(e.target.value);
                                     }}
                                     value={kategori}
                                 >
@@ -191,7 +170,7 @@ export default function EditMenu() {
                     width: "100%",
                     height: "40px",
                     boxShadow: 8,
-                }} onClick={editMenu}>Save</Button>
+                }} onClick={edit}>Save</Button>
             </Paper>
             <Snackbar
                 sx={{ width: '100%' }}

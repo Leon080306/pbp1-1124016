@@ -1,43 +1,29 @@
 import { Alert, Button, FormControl, InputLabel, MenuItem, Paper, Select, Slide, Snackbar, TextField } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
+import { useCreateMenu } from "../hooks/useCreateMenu";
+import type { Kategori, Label, Size } from "../types";
 export default function AddMenu() {
     const [showAlert, setShowAlert] = useState(false);
     const [nama, setName] = useState("");
     const [deskripsi, setDesc] = useState("");
     const [harga, setPrice] = useState(0);
-    const [size, setSize] = useState("");
-    const [label, setLabel] = useState("");
-    const [kategori, setCategory] = useState("");
+    const [size, setSize] = useState<Size | undefined>(undefined);
+    const [label, setLabel] = useState<Label | undefined>(undefined);
+    const [kategori, setCategory] = useState<Kategori | undefined>(undefined);
     const navigate = useNavigate();
+    const createMenu = useCreateMenu();
 
     const addMenu = async () => {
-        const response = await fetch("http://localhost:5173/api/create-menu", {
-            method: "POST",
-            headers: {
-                "content-type": "application/json"
-            },
-            body: JSON.stringify({
-                nama,
-                deskripsi,
-                harga, 
-                size,
-                label,
-                kategori
-            }),
-        })
-
-        const data = await response.json();
-        if (response.status !== 200) {
-            alert("Failed to create menu: " + data.message);
+        if (!size || !label || !kategori|| !nama || !deskripsi || !harga){
             return;
         }
-
-        setShowAlert(true);
-        setTimeout(() => {
-            navigate("/list-menu");
-        }, 1000)
+        if (await createMenu({ nama, deskripsi, harga, size, label, kategori })) {
+            setShowAlert(true);
+            setTimeout(() => {
+                navigate("/list-menu");
+            }, 1000)
+        }
     }
 
     return <div>
@@ -108,7 +94,7 @@ export default function AddMenu() {
                                     id="demo-simple-select"
                                     label="Size"
                                     onChange={(e) => {
-                                        setSize(e.target.value as string);
+                                        setSize(e.target.value);
                                     }}
                                     value={size}
                                 >
@@ -116,7 +102,7 @@ export default function AddMenu() {
                                     <MenuItem value="medium">Medium</MenuItem>
                                     <MenuItem value="large">Large</MenuItem>
                                 </Select>
-                            </FormControl>  
+                            </FormControl>
 
                             <FormControl fullWidth sx={{
                                 marginBottom: "24px"
@@ -127,7 +113,7 @@ export default function AddMenu() {
                                     id="demo-simple-select"
                                     label="Label"
                                     onChange={(e) => {
-                                        setLabel(e.target.value as string);
+                                        setLabel(e.target.value);
                                     }}
                                     value={label}
                                 >
@@ -145,7 +131,7 @@ export default function AddMenu() {
                                     id="demo-simple-select"
                                     label="Category"
                                     onChange={(e) => {
-                                        setCategory(e.target.value as string);
+                                        setCategory(e.target.value);
                                     }}
                                     value={kategori}
                                 >

@@ -1,29 +1,14 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router";
-import type {Menu} from "./../types";
+import { useAppSelector } from "../hooks/useAppSelector";
 
 export default function MenuDetail() {
     const { id } = useParams();
-    const [menu, setMenu] = useState<Menu | undefined>(undefined);
+    const {menuList} = useAppSelector(s => s.menu)
 
-    useEffect(() => {
-        const getDetails = async () => {
-            const response = await fetch("http://localhost:5173/api/menu/" + id, {
-                method: "GET",
-                headers: {
-                    "content-type": "application/json"
-                },
-            })
-
-            const data = await response.json();
-            if (response.status !== 200) {
-                alert("Failed to create menu: " + data.message);
-                return;
-            }
-            setMenu(data);
-        }
-        getDetails();
-    }, [])
+    const menu = useMemo(() => {
+        return menuList.filter(menu => menu.id === id)[0];
+    }, [menuList, id])
 
     return <div style={{
         paddingInline: "32px"
