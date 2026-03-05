@@ -10,18 +10,22 @@ export function Layout(props: PropsWithChildren) {
                 justifyContent: "center"
             }}>
                 <Box display="flex" justifyContent="space-evenly" width="50%">
-                    <Link to="/list-menu">
+                    <Link to="/">
                         <Button variant="text" sx={{
                             color: "white",
                             width: "100px",
                             "&:hover": {
                                 backgroundColor: "rgba(255,255,255,0.1)",
                             },
-                        }}><b>Menu List</b></Button>
+                        }}><b>Home</b></Button>
                     </Link>
                 </Box>
             </Toolbar>
         </AppBar>
-        {props.children}
+        <Box sx={{
+            paddingInline: "32px"
+        }}>
+            {props.children}
+        </Box>
     </Stack>
 }
