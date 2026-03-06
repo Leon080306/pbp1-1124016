@@ -23,7 +23,7 @@ export function Layout(props: PropsWithChildren) {
             </Toolbar>
         </AppBar>
         <Box sx={{
-            paddingInline: "32px"
+            paddingInline: "64px"
         }}>
             {props.children}
         </Box>

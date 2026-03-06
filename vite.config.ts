@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://kuis1-pbp.hansyulian.space/api',
+        target: 'https://uts-pbp-0sipdzol.hansyulian.space/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
